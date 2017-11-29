@@ -36,6 +36,13 @@ python_tests(
   ]
 )
 
+python_tests(
+  name='peek_integration',
+  sources=['test_peek_integration.py'],
+  dependencies=[
+    'tests/python/pants_test:int-test',
+  ]
+)
 
 python_tests(
   name='meta_rename_integration',
