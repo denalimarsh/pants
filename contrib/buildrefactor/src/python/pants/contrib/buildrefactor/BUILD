@@ -28,6 +28,6 @@ python_library(
 
 
 python_library(
-  name='peek',
-  sources=['peek.py']
+  name='print_target',
+  sources=['print_target.py']
 )

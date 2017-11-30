@@ -5,43 +5,47 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
-from pants.task.task import Task
+from pants.task.console_task import ConsoleTask
 from pants.contrib.buildrefactor.buildozer import Buildozer
 
 
-class Peek(Task):
-  """Peek a build file for a specified target
+class PrintTarget(ConsoleTask):
+  """Print's a specified target if found in the associated build file
 
     line-number: optional flag to print the starting and ending line numbers of the target
 
     Example:
-      $./pants peek --line-number testprojects/tests/java/org/pantsbuild/testproject/dummies:passing_target
+      $./pants print-target --line-number testprojects/tests/java/org/pantsbuild/testproject/dummies:passing_target
   """
 
   @classmethod
   def register_options(cls, register):
-    super(Peek, cls).register_options(register)
+    super(PrintTarget, cls).register_options(register)
 
     register('--line-number', help='Prints the starting line number of the named target.', type=bool, default=False)
 
   def __init__(self, *args, **kwargs):
-    super(Peek, self).__init__(*args, **kwargs)
+    super(PrintTarget, self).__init__(*args, **kwargs)
 
     self.options = self.get_options()
 
-  def execute(self):
-    self.print_name()
+  def console_output(self, targets):
+    result = ''
 
-  def print_name(self):
-    for root in self.context.target_roots:
-      address_spec = root.address.spec
+    root = self.context.target_roots.pop()
+    root_name = root.name
+    address_spec = root.address.spec
 
-    print('\n')
+    print('\'{}\' found in BUILD file.\n'.format(root_name))
+
     if self.options.line_number:
-      print('\n\'{}\' starts on line number:'.format(root.name))
+      print('Starts on line:'.format(root_name))
       Buildozer.execute_binary('print startline', address_spec, suppress_warnings=True)
-      print('\n\'{}\' ends on line number:'.format(root.name))
+      print('\nEnds on line:')
       Buildozer.execute_binary('print endline', address_spec, suppress_warnings=True)
-    else:
-      Buildozer.execute_binary('print name', address_spec, suppress_warnings=True)
-      print('Target found in BUILD file.')
+      print()
+
+    print('Target definiton:\n')
+    Buildozer.execute_binary('print rule', address_spec, suppress_warnings=True)
+
+    return result

@@ -8,23 +8,21 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 from pants_test.pants_run_integration_test import PantsRunIntegrationTest
 
 
-class PeekIntegrationTest(PantsRunIntegrationTest):
+class PrintTargetIntegrationTest(PantsRunIntegrationTest):
   """Test Peek goal functionality
 
-      $./pants test contrib/buildrefactor/tests/python/pants_test/contrib/buildrefactor:peek_integration
+      $./pants test contrib/buildrefactor/tests/python/pants_test/contrib/buildrefactor:print_target_integration
   """
 
   def test_print_name(self):
-    peek_print_run = self.run_pants(['peek',
+    print_target_print_run = self.run_pants(['print-target',
       'testprojects/tests/java/org/pantsbuild/testproject/buildrefactor/x:X'])
 
-    self.assertIn('[peek]\n\nX\nTarget found in BUILD file.', peek_print_run.stdout_data)
-    self.assertIn('SUCCESS', peek_print_run.stdout_data)
+    self.assertIn('Target definiton:\n\njava_library(\n    name = "X",\n)\n', print_target_print_run.stdout_data)
 
   def test_print_line_number(self):
-    peek_line_number_run = self.run_pants(['peek',
+    print_target_line_number_run = self.run_pants(['print-target',
       '--line-number',
       'testprojects/tests/java/org/pantsbuild/testproject/buildrefactor/x:X'])
 
-    self.assertIn('[peek]\n\n\n\'X\' starts on line number:\n4', peek_line_number_run.stdout_data)
-    self.assertIn('SUCCESS', peek_line_number_run.stdout_data)
+    self.assertIn('Starts on line:\n4\n\nEnds on line:\n6', print_target_line_number_run.stdout_data)
